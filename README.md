@@ -285,8 +285,7 @@ What **is** shipped:
 
 ---
 
-## File map (high-level)
-
+## File map 
 ```
 src/
   app/
