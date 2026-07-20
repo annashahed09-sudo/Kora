@@ -285,7 +285,29 @@ What **is** shipped:
 
 ---
 
-## File map 
+## What isn't shipped — honest list
+
+The v1.0 README catalogues what exists, not what we'd like to claim exists. The following are **deliberately deferred** past v1.0:
+
+- Multi-tenant organisations (model is in the schema, RLS not yet enforcing cross-tenant isolation)
+- Real AI model integration (all `/home` suggestions are demo content; the `lib/ai` abstraction is the contract for v1.1)
+- Real OAuth flows for integrations (`lib/integrations` is the registry; each provider's OAuth handshake ships in v1.1)
+- Real-time collaboration (single-user assumption)
+- Billing / Stripe model
+- Desktop and mobile applications
+- Plugin system
+
+What **is** shipped:
+
+- Every flagship route renders with intentional, polished empty and populated states
+- Premium visual identity consistent across all surfaces
+- Production-grade foundations for auth, RLS, file storage, logging
+- Architecture abstractions that make the deferred items tractable, not re-architectures
+
+---
+
+## File map (high-level)
+
 ```
 src/
   app/

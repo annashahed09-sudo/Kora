@@ -1,0 +1,245 @@
+@import "tailwindcss";
+
+/* ---------------------------------------------------------------------------
+   Kora design tokens — pure-black ground, warm cream highlights, halftone
+   wire. The v2.0 brand elevation is grounded in two reference designs:
+
+     - Reference 1: dark editorial with 3D mesh floral and copper-cream
+       highlight; restrained interaction; one pulse of italic.
+     - Reference 2: half-tone floral of distributed cream + blue dots
+       saying "IT IS A PRIVILEGE TO AWAKEN YOURSELF"; quiet, deliberate.
+
+   Brand DNA: pure black ground, warm cream highlight, halftone dot matrix,
+   editorial display type, NO glow, NO gradient, NO glass overload,
+   restrained motion, subtle buttons.
+
+   Tokens are wired through @theme inline so Tailwind 4 generates
+   (bg-bg, text-fg, border-line, …) utilities at build time.
+   --------------------------------------------------------------------------- */
+
+@theme inline {
+  --color-bg: #000000;          /* pure black — the reference ground    */
+  --color-bg-soft: #080808;     /* one step up from pure black          */
+  --color-bg-card: #0c0c0c;     /* raised card                         */
+  --color-bg-elevated: #111111; /* hover state for cards                */
+
+  --color-fg: #f5f2ee;          /* warm paper white (body / display)   */
+  --color-fg-strong: #ffffff;   /* brightest white                     */
+  --color-fg-muted: #a8a59f;    /* warmer body — slight cream cast     */
+  --color-fg-subtle: #6b6862;   /* softer still                        */
+  --color-fg-faint: #45433f;    /* whisper — only for hairlines        */
+
+  --color-line: #1c1c1c;
+  --color-line-soft: #131313;
+  --color-line-strong: #2a2a2a;
+
+  /* Discrete navy hover tone — used as a border / soft fill only.
+     Never as a glow, never as a gradient. The deep-navy base was unused
+     after the v2.0 polish (no glow / no gradient rule) and was removed. */
+  --color-navy-muted: #2a3349;
+  --color-navy-soft: #141925;
+
+  /* The single restrained accent — warm paper highlight.
+     Italic moments, selected dot, the wordmark glyph's center. */
+  --color-accent: #efe9df;
+  /* The copper-cream — used once or twice in the whole product,
+     never on body text. */
+  --color-accent-warm: #c8b89a;
+
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-newsreader);
+
+  --radius-sm: 6px;
+  --radius: 10px;
+  --radius-lg: 14px;
+
+  /* Editorial display scale — slightly tighter than the Tailwind default */
+  --tracking-display: -0.025em;
+
+  --animate-fade-in: fade-in 0.6s ease-out;
+  --animate-slide-up: slide-up 0.5s ease-out;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ---------------------------------------------------------------------------
+   Base — restore Geist, set the warm cream body, define focus ring.
+   --------------------------------------------------------------------------- */
+@layer base {
+  *,
+  *::before,
+  *::after {
+    border-color: var(--color-line);
+  }
+
+  html {
+    color-scheme: dark;
+    background: #000;
+  }
+
+  html,
+  body {
+    background: #000;
+    color: var(--color-fg);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    font-feature-settings: "ss01", "cv11", "calt";
+  }
+
+  ::selection {
+    background: var(--color-fg);
+    color: #000;
+  }
+
+  /* Quiet focus ring — visible but never vibrating. */
+  :focus-visible {
+    outline: 2px solid var(--color-accent-warm);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Utilities — editorial typography & chrome details.
+   --------------------------------------------------------------------------- */
+@layer utilities {
+  .text-display {
+    font-family: var(--font-display);
+    letter-spacing: var(--tracking-display);
+    line-height: 0.92;
+    font-feature-settings: "ss01";
+  }
+
+  .eyebrow {
+    font-family: var(--font-sans);
+    font-size: 0.6875rem;
+    line-height: 1;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--color-fg-muted);
+    font-weight: 500;
+  }
+
+  .h-divider {
+    height: 1px;
+    background: linear-gradient(
+      to right,
+      transparent 0%,
+      var(--color-line) 18%,
+      var(--color-line) 82%,
+      transparent 100%
+    );
+  }
+
+  /* Quiet grainy texture layer — used very sparingly by the hero.
+     NOTE: this is a true random-grain effect (transparent radial dots),
+     not a halftone matrix; keep it ultra-subtle. */
+  .grain {
+    position: relative;
+  }
+  .grain::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.04;
+    mix-blend-mode: overlay;
+    background-image: radial-gradient(
+      rgba(245, 242, 238, 0.6) 0.6px,
+      transparent 0.8px
+    );
+    background-size: 3px 3px;
+  }
+
+  /* Subtle staggered entry — only used on the landing hero. */
+  .animate-entry {
+    animation: fade-in 0.6s ease-out both, slide-up 0.5s ease-out both;
+  }
+
+  .animate-entry-1 { animation-delay: 0.05s; }
+  .animate-entry-2 { animation-delay: 0.1s; }
+  .animate-entry-3 { animation-delay: 0.15s; }
+  .animate-entry-4 { animation-delay: 0.2s; }
+  .animate-entry-5 { animation-delay: 0.25s; }
+
+  /* Editorial card hover — quiet navy border, no glow shadow. */
+  .card-navy {
+    border: 1px solid var(--color-line);
+    background: var(--color-bg-card);
+    transition: border-color 380ms cubic-bezier(0.32, 0.72, 0, 1),
+                background 380ms cubic-bezier(0.32, 0.72, 0, 1);
+  }
+  .card-navy:hover {
+    border-color: var(--color-navy-muted);
+    background: var(--color-bg-elevated);
+  }
+
+  /* Scrollbar styling — quiet on dark ground. */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-line-strong);
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-fg-faint);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Tailwind 4 @utility — first-class custom utilities.
+
+   `halftone` is the v2.0 signature backdrop. Two staggered radial dot fields
+   build a quiet halftone matrix on the pure-black ground — exactly the
+   substrate of reference 2. `halftone-dense` is the heavier variant used by
+   the hero and the knowledge graph tile so they read as "designed", not as
+   "empty state".
+
+   `transition-editorial` is slower than the Tailwind 200ms default and uses
+   the gentle cubic-bezier(0.32, 0.72, 0, 1) curve — appropriate for editorial
+   surfaces where abrupt motion is wrong.
+   --------------------------------------------------------------------------- */
+
+@utility halftone {
+  background-color: #000;
+  background-image:
+    radial-gradient(circle at center, rgba(245, 242, 238, 0.10) 0.7px, transparent 1px),
+    radial-gradient(circle at center, rgba(200, 184, 154, 0.06) 0.5px, transparent 1.5px);
+  background-size: 14px 14px, 22px 22px;
+  background-position: 0 0, 7px 7px;
+}
+
+@utility halftone-dense {
+  background-color: #000;
+  background-image:
+    radial-gradient(circle at center, rgba(245, 242, 238, 0.16) 0.7px, transparent 1.1px),
+    radial-gradient(circle at center, rgba(200, 184, 154, 0.10) 0.5px, transparent 1.5px),
+    radial-gradient(circle at center, rgba(120, 140, 170, 0.06) 0.5px, transparent 1.5px);
+  background-size: 12px 12px, 20px 20px, 30px 30px;
+  background-position: 0 0, 6px 9px, 13px 4px;
+}
+
+@utility transition-editorial {
+  transition-property: color, background-color, border-color, opacity, transform;
+  transition-duration: 380ms;
+  transition-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
+}
