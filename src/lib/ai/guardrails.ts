@@ -1,42 +1,20 @@
-/**
- * AI guardrails — pure defensive helpers that run BEFORE any provider call.
- *
- * Three concrete hard-stops:
- *
- *   1. `estimateTokens` — char-based heuristic before any provider is hit
- *      so we never burn tokens on inputs that would be rejected anyway.
- *   2. `throwIfDisallowed` — input shape + size guard against prompt
- *      injection (oversized payloads, control characters, disallowed
- *      URL/exfil markers).
- *   3. `enforceDailyQuota` — in-process counter that the AI provider checks
- *      before generating. v1.1 swaps this for a Supabase row tally.
- *
- * These are not strict OpenAI limit figures. They are conservative upper
- * bounds so a misconfig'd request never gets within an order of magnitude
- * of the real ceiling.
- */
-
-const MAX_PROMPT_CHARS = 4_000;       // ~1k tokens of explicit prompt
+const MAX_PROMPT_CHARS = 4_000;       
 const MAX_CONTEXT_ITEMS = 32;
 const MAX_CONTEXT_ITEM_CHARS = 4_000;
-const DAILY_TOKEN_BUDGET = 200_000;   // per-user per-day ceiling
+const DAILY_TOKEN_BUDGET = 200_000;   
 
-/* ----------------------------------------------------------------- input -- */
-
-/** Strips control characters and trims to a hard length cap. */
 export function scrub(input: string): string {
-  // Control chars 0x00..0x1F except whitespace; remove the lot.
+  
   return input
     .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, "")
     .replace(/\u200B-\u200F/g, "")
     .slice(0, MAX_PROMPT_CHARS);
 }
 
-/** Block addresses + canonical instruction-overrides that could be exfil. */
 const EXFIL_PATTERNS: RegExp[] = [
   /ignore (all|previous|prior) instructions/i,
   /reveal (your|the) system prompt/i,
-  /\bid\s*[:=]\s*["']?sk-[A-Za-z0-9]{20,}/i,        // bare OpenAI key
+  /\bid\s*[:=]\s*["']?sk-[A-Za-z0-9]{20,}/i,        
   /(?:https?:\/\/)?[a-z0-9-]+\.openai\.com\/v1\//i,
 ];
 
@@ -81,14 +59,10 @@ export function throwIfDisallowed(input: AiGuardInput): void {
   }
 }
 
-/* ----------------------------------------------------------- tokenizing -- */
-
-/** Rough char→token estimate at the 4-chars-per-token ratio. */
 export function estimateTokens(input: string): number {
   return Math.ceil(input.length / 4);
 }
 
-/** Total tokens for an AI call (prompt + context). */
 export function estimateTotalTokens(input: AiGuardInput): number {
   let total = estimateTokens(input.prompt);
   if (input.context) {
@@ -99,9 +73,6 @@ export function estimateTotalTokens(input: AiGuardInput): number {
   return total;
 }
 
-/* ----------------------------------------------------------- quota mgmt -- */
-
-/** Per-process counter; not distributed. v1.1 swaps to Supabase row counts. */
 const processState = new Map<string, { date: string; usedTokens: number }>();
 
 function todayKey(): string {
@@ -129,12 +100,6 @@ export function recordTokens(userId: string | null, tokens: number): void {
   processState.set(key, { date: k, usedTokens: u.usedTokens + tokens });
 }
 
-/* ------------------------------------------------------------ cost cap -- */
-
-/**
- * Conservative micro-cost ceiling so a runaway loop can't rack up $$$. The
- * stub provider returns 0; the real v1.1 provider will return actual USD.
- */
 export function estimateCostCents(input: AiGuardInput): number {
   const tokens = estimateTotalTokens(input);
   const cents = Math.ceil(tokens / 1000); // 1¢ per 1k tokens
