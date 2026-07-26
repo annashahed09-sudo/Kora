@@ -1,15 +1,3 @@
-/**
- * Supabase session refresh, used by the root `middleware.ts`.
- *
- * On every request:
- * 1. Read cookies from the incoming NextRequest
- * 2. Build a Supabase server client with that cookie store
- * 3. Refresh the session if it's expiring
- * 4. Propagate any cookies the auth flow set on the response
- *
- * Uses `lib/env` so the placeholder branch only fires when the env is
- * genuinely unconfigured (dev) and not because a typo in a Next preset.
- */
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import type { Database } from "@/types/database";
@@ -23,7 +11,6 @@ export async function updateSession(request: NextRequest): Promise<{
   const e = env();
 
   if (!e.hasSupabase) {
-    // Env missing — pass through. The route-level auth guard fires next.
     return { response, isAuthed: false };
   }
 
@@ -53,10 +40,7 @@ export async function updateSession(request: NextRequest): Promise<{
       },
     }
   );
-
-  // getUser() is the authoritative check — it validates the JWT against
-  // the Supabase Auth server. The middleware uses this to decide whether
-  // the request is redirect-worthy.
+  
   const {
     data: { user },
   } = await supabase.auth.getUser();
