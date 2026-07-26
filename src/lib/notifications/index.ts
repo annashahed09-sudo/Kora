@@ -1,12 +1,3 @@
-/**
- * Notifications abstraction.
- *
- * Pages call `listForUser(userId)` to render the inbox feed. The default
- * implementation reads from Supabase `public.notifications` directly; for
- * v1.0 without persistence, the function returns the demo feed so the
- * surface is still populated.
- */
-
 type NotificationKind = "mention" | "comment" | "system" | "invite";
 
 export type Notification = {
@@ -23,8 +14,7 @@ export async function listForUser(
   userId: string | null,
   options: { unreadOnly?: boolean; kind?: NotificationKind } = {}
 ): Promise<Notification[]> {
-  // Demo-mode path. v1.1 swaps this for a Supabase query +
-  // the real-time channel so multi-device fan-out is real.
+  
   const all = demoFeed();
   return all.filter((n) =>
     (!options.unreadOnly || !n.readAt) &&
