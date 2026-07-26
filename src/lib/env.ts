@@ -1,16 +1,3 @@
-/**
- * Environment validator.
- *
- * Validates `process.env` once on first import; subsequent calls return the
- * cached snapshot. In production, missing required client-facing vars cause
- * a hard throw at process boot so misconfiguration doesn't silently degrade
- * auth. In development, missing vars log a warning and surfaces continue
- * to render against demo data.
- *
- * SECURITY: server-only keys live in this file but are never re-exported
- * from anywhere that could reach the client bundle. The "use client"
- * modules only read `NEXT_PUBLIC_*` variables through the validated shape.
- */
 import { z } from "zod";
 
 const publicSchema = z.object({
@@ -29,8 +16,6 @@ const publicSchema = z.object({
 });
 
 const serverSchema = z.object({
-  // Service-role keys are 200+ chars in practice. 40+ is a much weaker
-  // floor that still catches "I forgot to paste it" cases.
   SUPABASE_SERVICE_ROLE_KEY: z.string().min(40).optional(),
   OPENAI_API_KEY: z.string().min(20).optional(),
   SUPABASE_PROJECT_REF: z.string().optional(),
@@ -41,12 +26,7 @@ type ServerEnv = z.infer<typeof serverSchema>;
 
 export type KoraEnv = PublicEnv &
   ServerEnv & {
-    /** True when this process is running Next.js production build. */
     isProd: boolean;
-    /**
-     * True when NEXT_PUBLIC_SUPABASE_URL is configured AND reachable.
-     * Pages use this to render DemoPill vs. real chrome.
-     */
     hasSupabase: boolean;
   };
 
@@ -75,8 +55,6 @@ function parse(): KoraEnv {
   });
 
   if (!svr.success && isProd && !warned) {
-    // Not a hard throw — server-side features degrade gracefully. The
-    // browser-side check below IS a hard throw.
     console.warn("[kora/env] server-side vars invalid — storage/AI may degrade to inert mode.");
     warned = true;
   }
@@ -98,11 +76,6 @@ export function env(): KoraEnv {
   return cached;
 }
 
-/**
- * Hard-fail in production if the browser-side Supabase config is missing.
- * Pages call this on first render — empty config in prod is a deployment
- * bug, not a dev convenience.
- */
 export function assertBrowserSupabase(): { url: string; anon: string } {
   const e = env();
   if (!e.hasSupabase && e.isProd) {
@@ -116,10 +89,6 @@ export function assertBrowserSupabase(): { url: string; anon: string } {
   };
 }
 
-/**
- * Server-only check. NEVER call from a client component — the keys these
- * return will leak if the import graph reaches the bundle.
- */
 export function assertServerSupabase(): { url: string; serviceKey: string } {
   const e = env();
   if (!e.SUPABASE_SERVICE_ROLE_KEY) {
@@ -131,7 +100,6 @@ export function assertServerSupabase(): { url: string; serviceKey: string } {
   };
 }
 
-/** Clears the cached snapshot. Test-only helper. */
 export function __resetEnvForTests(): void {
   cached = null;
   warned = false;
