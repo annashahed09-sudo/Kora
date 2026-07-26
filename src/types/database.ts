@@ -1,15 +1,3 @@
-/**
- * Hand-typed Supabase database schema. Mirrors:
- *   0001_init.sql        — users, projects, blocks, comments, shares
- *   0002_share_rpc.sql   — get_share_by_token (returns a row-shaped snapshot)
- *   0003_platform.sql    — workspaces, folders, items, tags, mentions,
- *                          notifications, ai_artifacts, integrations
- *
- * When wiring real Supabase, regenerate with:
- *   supabase gen types typescript --project-id <ref> --schema public \
- *     > src/types/database.ts
- * and diff against this file.
- */
 export type Json =
   | string
   | number
