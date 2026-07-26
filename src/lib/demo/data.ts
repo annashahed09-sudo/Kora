@@ -1,15 +1,3 @@
-/**
- * Demo data layer.
- *
- * Pages use these stubs so the surface renders even when no real Supabase
- * data exists — vital for "first impression" demos before the user has
- * created any of their own work. Each stub is structurally aligned with
- * the corresponding Database row to make the swap-in trivial.
- *
- * To wire real data later: replace the import in each page with a real
- * Supabase query. No page logic changes.
- */
-
 import type {
   ItemType,
   IntegrationProvider,
@@ -57,8 +45,6 @@ export type DemoAiArtifact = {
   createdAt: string;
 };
 
-/* -------------------------------------------------------------- projects -- */
-
 export const DEMO_PROJECTS: DemoProject[] = [
   {
     id: "demo-1",
@@ -101,8 +87,6 @@ export const DEMO_PROJECTS: DemoProject[] = [
     collaborators: [{ initials: "JU", color: "#9bc1a4" }],
   },
 ];
-
-/* ---------------------------------------------------------------- items -- */
 
 export const DEMO_ITEMS: DemoItem[] = [
   {
@@ -194,15 +178,11 @@ export const DEMO_KANBAN: Record<string, DemoItem[]> = {
   ],
 };
 
-/* -------------------------------------------------------------- mentions -- */
-
 export const DEMO_MENTIONS: DemoMention[] = [
   { sourceId: "it-1", targetId: "it-3" },
   { sourceId: "it-2", targetId: "it-5" },
   { sourceId: "it-8", targetId: "it-4" },
 ];
-
-/* -------------------------------------------------------- integrations -- */
 
 export const DEMO_INTEGRATIONS: DemoIntegration[] = [
   { provider: "figma", status: "connected", note: "2 files linked" },
@@ -213,8 +193,6 @@ export const DEMO_INTEGRATIONS: DemoIntegration[] = [
   { provider: "linear", status: "connected", note: "Status updates on" },
   { provider: "dropbox", status: "demo", note: "Planned for v1.1" },
 ];
-
-/* ----------------------------------------------------- AI artifact log -- */
 
 export const DEMO_AI_ARTIFACTS: DemoAiArtifact[] = [
   {
@@ -246,16 +224,12 @@ export const DEMO_AI_ARTIFACTS: DemoAiArtifact[] = [
   },
 ];
 
-/* ---------------------------------------------------- calendar entries -- */
-
 export const DEMO_CALENDAR_ENTRIES = [
   { id: "cal-1", title: "Brief review (Acme)", at: relativeIsoIso(60 * 24), kind: "meeting" },
   { id: "cal-2", title: "Deliver v2 — Beta Atelier", at: relativeIsoIso(60 * 48), kind: "deadline" },
   { id: "cal-3", title: "Press call — Delta", at: relativeIsoIso(60 * 96), kind: "meeting" },
   { id: "cal-4", title: "Weekly workspace review", at: relativeIsoIso(60 * 24 * 7), kind: "recurring" },
 ];
-
-/* ----------------------------------------------------- research entries -- */
 
 export const DEMO_RESEARCH = [
   {
@@ -289,8 +263,6 @@ export const DEMO_RESEARCH = [
     tag: "copywriting",
   },
 ];
-
-/* ---------------------------------------------------------- media items -- */
 
 export const DEMO_MEDIA = [
   {
@@ -337,8 +309,6 @@ export const DEMO_MEDIA = [
   },
 ];
 
-/* ------------------------------------------------------------ smartviews -- */
-
 export const DEMO_SMARTVIEWS = [
   { id: "view-pin", title: "Pinned projects", glyph: "★", count: 3 },
   { id: "view-today", title: "Today", glyph: "•", count: 2 },
@@ -346,8 +316,6 @@ export const DEMO_SMARTVIEWS = [
   { id: "view-archive", title: "Archive", glyph: "◇", count: 0 },
   { id: "view-trash", title: "Trash", glyph: "○", count: 0 },
 ];
-
-/* ------------------------------------------------------------ folder tree -- */
 
 export const DEMO_FOLDERS = [
   { id: "f-1", name: "Studio notes", icon: "◇", depth: 0 },
@@ -357,8 +325,6 @@ export const DEMO_FOLDERS = [
   { id: "f-5", name: "Reading", icon: "○", depth: 0 },
   { id: "f-6", name: "Skipped later", icon: "▫", depth: 0 },
 ];
-
-/* ----------------------------------------------------------------- helpers */
 
 export function relativeIso(offsetMinutes: number): string {
   return new Date(Date.now() + offsetMinutes * 60_000).toISOString();
