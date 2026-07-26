@@ -12,20 +12,12 @@ import {
   type SignupInput,
 } from "@/lib/zod/schemas";
 
-/**
- * Form-action state shape. We never leak server error stack traces; the
- * `message` field holds the user-facing copy only.
- */
 export type AuthActionState = {
   ok: boolean;
   message?: string;
   fieldErrors?: Partial<Record<"email" | "password", string>>;
 };
 
-/**
- * Rate-limit an unauthenticated action by client IP. signup is slower than
- * login because each successful signup writes a row; we cap it harder.
- */
 async function enforceIpRateLimit(
   action: "login" | "signup",
   limit: number,
@@ -41,8 +33,6 @@ async function enforceIpRateLimit(
     throw new Error("Too many attempts. Try again in a minute.");
   }
 }
-
-/* ----------------------------------------------------------------- signup -- */
 
 export async function signup(
   _prev: AuthActionState,
@@ -69,8 +59,6 @@ export async function signup(
     return { ok: false, message: error.message };
   }
 
-  // Mirror the auth user into public.users so RLS policies downstream have
-  // a profile row to key against. 23505 means the trigger already did it.
   if (data.user) {
     const { error: profileError } = await supabase
       .from("users")
@@ -89,8 +77,6 @@ export async function signup(
   revalidatePath("/dashboard");
   redirect("/dashboard");
 }
-
-/* ------------------------------------------------------------------ login -- */
 
 export async function login(
   _prev: AuthActionState,
@@ -114,7 +100,6 @@ export async function login(
   });
 
   if (error) {
-    // Generic copy — never confirm/deny whether the email exists.
     return { ok: false, message: "Email or password is incorrect." };
   }
 
@@ -122,15 +107,12 @@ export async function login(
   redirect("/dashboard");
 }
 
-/* ----------------------------------------------------------------- logout -- */
-
 export async function logout() {
   const supabase = await createClient();
   await supabase.auth.signOut();
   redirect("/");
 }
 
-/* ---------------------------------------------------------------- helpers -- */
 
 function fieldErrorsFrom(
   parsed: { error: { flatten: () => { fieldErrors: Record<string, string[]> } } }
