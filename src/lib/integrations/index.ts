@@ -1,16 +1,3 @@
-/**
- * Integrations registry.
- *
- * Kora surfaces connected services (Google Drive, Figma, GitHub, Slack, …)
- * without coupling page code to a vendor. Each provider registers itself
- * with display metadata + a sync factory; OAuth handshakes plug into the
- * `connect()` hook in v1.1.
- *
- * The UI scrapes this registry to render `/settings/integrations` and to
- * surface inline integration state on `/inbox`, `/home`, and per-project
- * pages.
- */
-
 import type { IntegrationProvider } from "@/types/database";
 
 export type IntegrationCapability =
@@ -31,10 +18,10 @@ export interface IntegrationMeta {
   id: IntegrationProvider;
   name: string;
   description: string;
-  icon: string;             // serialised inline SVG path data — see `icons.ts`
+  icon: string;           
   capabilities: IntegrationCapability[];
   category: "files" | "design" | "engineering" | "communication";
-  available: boolean;       // false until v1.1 wiring lands
+  available: boolean;      
 }
 
 export interface IntegrationInstance extends IntegrationMeta {
@@ -42,10 +29,6 @@ export interface IntegrationInstance extends IntegrationMeta {
   connect(): Promise<IntegrationState>;
   sync(): Promise<{ updatedAt: string; count: number }>;
 }
-
-/* ---------------------------------------------------------------------- */
-/* Catalog. Each entry is the canonical metadata for a provider.          */
-/* ---------------------------------------------------------------------- */
 
 const CATALOG: IntegrationMeta[] = [
   {
@@ -130,17 +113,11 @@ export function getIntegrationMeta(id: IntegrationProvider): IntegrationMeta | n
   return CATALOG.find((m) => m.id === id) ?? null;
 }
 
-/* ---------------------------------------------------------------------- */
-/* Instance factory. v1.0 returns a "demo" state so the UI renders        */
-/* without OAuth configured. v1.1 wires real provider implementations.    */
-/* ---------------------------------------------------------------------- */
-
 export function listIntegrationInstances(): IntegrationInstance[] {
   return CATALOG.map((meta) => ({
     ...meta,
     state: demoStateFor(meta),
     async connect() {
-      // v1.1: route through /api/integrations/[provider]/start
       throw new Error(`${meta.name} OAuth wiring is part of v1.1`);
     },
     async sync() {
