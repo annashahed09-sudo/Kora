@@ -1,10 +1,5 @@
 import { z } from "zod";
 
-/**
- * Zod schemas for every server-action entrypoint. Centralised so handlers
- * never re-declare the same shape and inferred types flow out uniformly.
- */
-
 const email = z.string().email("That doesn't look like an email address.");
 const password = z
   .string()
@@ -46,12 +41,6 @@ export const commentCreateSchema = z.object({
 });
 export type CommentCreateInput = z.infer<typeof commentCreateSchema>;
 
-/**
- * A canvas block is a self-describing cell on the tldraw surface.
- * v1 uses a minimal Acknowledge<>Ack-persisted shape; richer shape-snapshot
- * payloads (the full tldraw JSON) live in `content` and are validated by
- * their consumer in `Canvas`. Server only validates authority + shape size.
- */
 export const blockUpsertSchema = z.object({
   id: z.string(),
   project_id: z.string().uuid(),
